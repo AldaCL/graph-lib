@@ -26,7 +26,12 @@ def mesh_random_graph(m:int, n:int, is_directed: bool=False, graph_name: str="")
     if m < 1 or n < 1:
         print("m and n must be bigger than 1")
         raise ValueError()
-    list_of_nodes = list()
+
+    if graph_name == "":
+        graph_name = f"Mesh_{m}x{n}"
+
+    graph = Graph(is_directed=is_directed, name=graph_name)
+    list_of_nodes = list()    
     # Create list of nodes
     for column in range(m):
         row_nodes = list()
@@ -37,25 +42,19 @@ def mesh_random_graph(m:int, n:int, is_directed: bool=False, graph_name: str="")
         list_of_nodes.append(row_nodes)
     # print("List of nodes: ", list_of_nodes)
     # Flatten list of nodes
-    list_of_edges = list()
+
     for col in range(m):
         for ix in range(n):
             if ix + 1 < n:
-                list_of_edges.append(Edge(list_of_nodes[col][ix],list_of_nodes[col][ix+1]))
+                graph.add_edge(list_of_nodes[col][ix], list_of_nodes[col][ix + 1])
             if col + 1 < m:
-                list_of_edges.append(Edge(list_of_nodes[col][ix],list_of_nodes[col + 1][ix]))
-                
+                graph.add_edge(list_of_nodes[col][ix],list_of_nodes[col + 1][ix])
+
     # print("List of edges: ", list_of_edges)
     list_of_nodes = [node for row in list_of_nodes for node in row]
-    
-    if graph_name == "":
-        graph_name = f"Mesh_{m}x{n}"
-    graph = Graph(nodes=list_of_nodes,
-                  edges=list_of_edges,
-                  is_directed=is_directed,
-                  name=graph_name)
+    graph.nodes = list_of_nodes
 
-    graph.save_graphviz_by_node(filename=graph_name)
+    graph.save_graphviz_by_node()
     return graph
 
 def erdos_renyi_random_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
@@ -145,7 +144,6 @@ def geographical_random_graph(n:int, r:float, is_directed: bool=False, graph_nam
                   name=graph_name)
     graph.save_graphviz(filename=graph_name)
     return graph
-
 
 def barabasi_albert_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
     """

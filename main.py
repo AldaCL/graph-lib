@@ -16,7 +16,8 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--type", type=str, help="Type of graph to generate from the list: mesh, erdos, gilbert, geo, barabasi, dorogo")
     parser.add_argument("-m", type=int, help="Main number of nodes in the ")
     parser.add_argument("-n", type=int, help="Secondary number of nodes in the graph (If algorithm needs it)")
-    parser.add_argument("-d", "--directed", action="store_true", help="If the graph is directed", default=False)
+    parser.add_argument("-d", "--directed", action=argparse.BooleanOptionalAction, help="If the graph is directed", default=True)
+    parser.add_argument("-o", "--output", type=str, help="Output file name", default="")
     
     args = parser.parse_args()
     
@@ -28,7 +29,7 @@ if __name__ == "__main__":
         if args.m is None or args.n is None:
             print("You need to specify the main and secondary number of nodes")
             raise ValueError()
-        graph = dict_options[args.type](m=args.m, n=args.n)
+        graph = dict_options[args.type](m=args.m, n=args.n, is_directed=args.directed, graph_name=args.output)
     
         print("List of nodes: ", graph.nodes)
         print(len(graph.nodes))
