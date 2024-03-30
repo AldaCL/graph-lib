@@ -12,11 +12,16 @@ algorithm. The algorithms implemented in this module are:
 - Dorogovtsev-Mendes graph
 """
 from models.graph import Graph, Node, Edge
-
+import random
 
 def mesh_random_graph(m:int, n:int, is_directed: bool=False, graph_name: str="") -> Graph:
     """
-    Generate a graph with ,m*n nodes
+    Generate a graph with ,m*n nodes and connect n+1 node and 
+    m+1 node with an edge in a grid 
+    :param m: number of columns
+    :param n: number of rows
+    :param is_directed: if the graph is directed
+    :param graph_name: name of the graph
     """
     if m < 1 or n < 1:
         print("m and n must be bigger than 1")
@@ -50,5 +55,147 @@ def mesh_random_graph(m:int, n:int, is_directed: bool=False, graph_name: str="")
                   is_directed=is_directed,
                   name=graph_name)
 
+    graph.save_graphviz_by_node(filename=graph_name)
+    return graph
+
+def erdos_renyi_random_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
+    """
+    Generate a graph with n nodes and try m times 
+    to create an edge between two nodes using the Erdos-Renyi model
+    :param n: number of nodes
+    :param m: number of tries to create an edge
+    :param is_directed: if the graph is directed
+    :param graph_name: name of the graph
+    """
+    list_of_nodes = list()
+    for i in range(n):
+        list_of_nodes.append(Node(name=str(i)))
+    print(list_of_nodes)
+    list_of_edges = list()
+    
+    while len(list_of_edges) < m:
+        selected_nodes = random.sample(list_of_nodes, 2)
+        print(selected_nodes)
+        if selected_nodes[0] != selected_nodes[1]:
+            edge = Edge(selected_nodes[0], selected_nodes[1])
+            if edge not in list_of_edges:
+                list_of_edges.append(edge)
+            
+    
+    if graph_name == "":
+        graph_name = f"Erdos_{m}x{n}"
+    generated_graph = Graph(nodes=list_of_nodes,
+                            edges=list_of_edges,
+                            is_directed=is_directed,
+                            name=graph_name)
+
+    generated_graph.save_graphviz_by_node(filename=graph_name)
+
+    return generated_graph
+
+def gilbert_random_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
+    """
+    Generate a graph with n nodes and try m times 
+    to create an edge between two nodes
+    :param n: number of nodes
+    :param m: number of tries to create an edge
+    
+    """
+    if n < 1 or p < 0 or p > 1:
+        print("n must be bigger than 1 and p must be between 0 and 1")
+        raise ValueError()
+    list_of_nodes = [Node(name=str(i)) for i in range(n)]
+    list_of_edges = list()
+    for i in range(n):
+        for j in range(i+1, n):
+            if random.random() < p:
+                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
+            else:
+                list_of_edges.append(Edge(list_of_nodes[j], list_of_nodes[i]))
+    if graph_name == "":
+        graph_name = f"Gilbert_{n}_{p}"
+    graph = Graph(nodes=list_of_nodes,
+                  edges=list_of_edges,
+                  is_directed=is_directed,
+                  name=graph_name)
     graph.save_graphviz(filename=graph_name)
     return graph
+
+def geographical_random_graph(n:int, r:float, is_directed: bool=False, graph_name: str="") -> Graph:
+    """
+    Generate a graph with n nodes and radius r
+    """
+    if n < 1 or r < 0:
+        print("n must be bigger than 1 and r must be positive")
+        raise ValueError()
+    list_of_nodes = [Node(name=str(i)) for i in range(n)]
+    list_of_edges = list()
+    for i in range(n):
+        for j in range(i+1, n):
+            x1, y1 = list_of_nodes[i].get_position()
+            x2, y2 = list_of_nodes[j].get_position()
+            distance = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+            if distance < r:
+                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
+    if graph_name == "":
+        graph_name = f"Geographical_{n}_{r}"
+    graph = Graph(nodes=list_of_nodes,
+                  edges=list_of_edges,
+                  is_directed=is_directed,
+                  name=graph_name)
+    graph.save_graphviz(filename=graph_name)
+    return graph
+
+
+def barabasi_albert_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
+    """
+    Generate a graph with n nodes and m edges
+    """
+    if n < 1 or m < 1:
+        print("n and m must be bigger than 1")
+        raise ValueError()
+    list_of_nodes = [Node(name=str(i)) for i in range(m)]
+    list_of_edges = list()
+    for i in range(m, n):
+        list_of_nodes.append(Node(name=str(i)))
+        degrees = [len(node.edges) for node in list_of_nodes]
+        total_degree = sum(degrees)
+        probabilities = [degree/total_degree for degree in degrees]
+        for j in range(m):
+            if random.random() < probabilities[j]:
+                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
+    if graph_name == "":
+        graph_name = f"Barabasi_Albert_{n}_{m}"
+    graph = Graph(nodes=list_of_nodes,
+                  edges=list_of_edges,
+                  is_directed=is_directed,
+                  name=graph_name)
+    graph.save_graphviz(filename=graph_name)
+    return graph
+
+def dorogovtsev_mendes_graph(n:int, is_directed: bool=False, graph_name: str="") -> Graph:
+    """
+    Generate a graph with n nodes
+    """
+    if n < 1:
+        print("n must be bigger than 1")
+        raise ValueError()
+    list_of_nodes = [Node(name=str(i)) for i in range(3)]
+    list_of_edges = [Edge(list_of_nodes[0], list_of_nodes[1]),
+                    Edge(list_of_nodes[1], list_of_nodes[2]),
+                    Edge(list_of_nodes[2], list_of_nodes[0])]
+    for i in range(3, n):
+        list_of_nodes.append(Node(name=str(i)))
+        random_edge = random.choice(list_of_edges)
+        list_of_edges.append(Edge(list_of_nodes[i], random_edge.node_from))
+        list_of_edges.append(Edge(list_of_nodes[i], random_edge.node_to))
+    if graph_name == "":
+        graph_name = f"Dorogovtsev_Mendes_{n}"
+    graph = Graph(nodes=list_of_nodes,
+                  edges=list_of_edges,
+                  is_directed=is_directed,
+                  name=graph_name)
+    graph.save_graphviz(filename=graph_name)
+    return graph
+
+
