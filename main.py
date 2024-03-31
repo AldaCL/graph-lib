@@ -60,6 +60,24 @@ def generate_graph(args):
         print(f"List of {len(graph.nodes)} nodes: {graph.nodes}")
         print(f"List of {len(graph.edges)} edges:  {graph.edges}")
         
+    elif args.type == "barabasi":
+        if args.n is None or args.m is None:
+            raise ValueError("You need to specify the main number of nodes (n) and the number of edges to attach from a new node (m)")
+        elif args.n < 1 or args.m < 1:
+            raise ValueError("m and n must be bigger than 1")
+        graph = dict_options[args.type](n=args.n, d=args.m, is_directed=args.directed, graph_name=args.output)
+        print(f"List of {len(graph.nodes)} nodes: {graph.nodes}")
+        print(f"List of {len(graph.edges)} edges:  {graph.edges}")
+        
+    elif args.type == "dorogo":
+        if args.n is None:
+            raise ValueError("You need to specify the main number of nodes (n)")
+        elif args.n < 1:
+            raise ValueError("n must be bigger than 1")
+        graph = dict_options[args.type](n=args.n,is_directed=args.directed, graph_name=args.output)
+        print(f"List of {len(graph.nodes)} nodes: {graph.nodes}")
+        print(f"List of {len(graph.edges)} edges:  {graph.edges}")
+        
 def main():
     parser = argparse.ArgumentParser(description="Generate a graph by different algorithms")
     parser.add_argument("-t", "--type", type=str, help="Type of graph to generate from the list: mesh, erdos, gilbert, geo, barabasi, dorogo")

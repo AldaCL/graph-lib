@@ -112,6 +112,8 @@ def gilbert_random_graph(n:int, p:float, is_directed: bool=False, graph_name: st
         for j in range(n):
             if random.random() < p and i != j:
                 graph.add_edge(graph.nodes[i], graph.nodes[j])
+                
+    graph.save_graphviz_by_node()
     return graph
 
 
@@ -136,25 +138,24 @@ def geographical_random_graph(n:int, r:float, is_directed: bool=False, graph_nam
     graph.save_graphviz_by_node()
     return graph
 
-def barabasi_albert_graph(n:int, d:int, is_directed: bool=False, name: str="") -> Graph:
+def barabasi_albert_graph(n:int, d:int, is_directed: bool=False, graph_name: str="") -> Graph:
     """
     Generate a graph with n nodes and m edges
     """
-    if name == "":
-        name = f"Barabasi-Albert_{n}_{d}"
-    graph = Graph(is_directed=is_directed, name=name)
+    if graph_name == "":
+        graph_name = f"Barabasi-Albert_{n}_{d}"
+    graph = Graph(is_directed=is_directed, name=graph_name)
 
     for i in range(n):
         new_node = Node(name=str(i))
-        graph.add_node(new_node)
         for existent_node in graph.nodes:
             if existent_node != new_node:
                 chances =  1 - (existent_node.get_degree() / d)
                 if chances > random.random():
                     graph.add_edge(new_node, existent_node)
+        graph.add_node(new_node)
             
     graph.save_graphviz_by_node()
-    
     return graph
     
     
@@ -162,25 +163,24 @@ def dorogovtsev_mendes_graph(n:int, is_directed: bool=False, graph_name: str="")
     """
     Generate a graph with n nodes
     """
-    if n < 1:
-        print("n must be bigger than 1")
-        raise ValueError()
-    list_of_nodes = [Node(name=str(i)) for i in range(3)]
-    list_of_edges = [Edge(list_of_nodes[0], list_of_nodes[1]),
-                    Edge(list_of_nodes[1], list_of_nodes[2]),
-                    Edge(list_of_nodes[2], list_of_nodes[0])]
-    for i in range(3, n):
-        list_of_nodes.append(Node(name=str(i)))
-        random_edge = random.choice(list_of_edges)
-        list_of_edges.append(Edge(list_of_nodes[i], random_edge.node_from))
-        list_of_edges.append(Edge(list_of_nodes[i], random_edge.node_to))
     if graph_name == "":
-        graph_name = f"Dorogovtsev_Mendes_{n}"
-    graph = Graph(nodes=list_of_nodes,
-                  edges=list_of_edges,
-                  is_directed=is_directed,
-                  name=graph_name)
-    graph.save_graphviz(filename=graph_name)
+        graph_name = f"Dorogovtsev-Mendes_{n}"
+        
+    graph = Graph(is_directed=is_directed, name=graph_name)
+   # Generate start 3 nodes and edges:
+    for i in range(3):
+        graph.add_node(Node(name=str(i)))
+
+    graph.add_edge(graph.nodes[0], graph.nodes[1])
+    graph.add_edge(graph.nodes[1], graph.nodes[2])
+    graph.add_edge(graph.nodes[2], graph.nodes[0])
+
+    for i in range(3, 3+n):
+        new_node = Node(name=str(i))
+        selected_edge = random.choice(graph.edges)
+        graph.add_edge(new_node, selected_edge.node_from)
+        graph.add_edge(new_node, selected_edge.node_to)
+        graph.add_node(new_node)
+        
+    graph.save_graphviz_by_node()
     return graph
-
-
