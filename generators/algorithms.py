@@ -11,7 +11,8 @@ algorithm. The algorithms implemented in this module are:
 - Barabasi-Albert varian graph
 - Dorogovtsev-Mendes graph
 """
-from models.graph import Graph, Node, Edge
+from models.graph import Graph, Node, Edge, GeoNode
+from generators import utils
 import random
 
 def mesh_random_graph(m:int, n:int, is_directed: bool=False, graph_name: str="") -> Graph:
@@ -66,111 +67,97 @@ def erdos_renyi_random_graph(n:int, m:int, is_directed: bool=False, graph_name: 
     :param is_directed: if the graph is directed
     :param graph_name: name of the graph
     """
-    list_of_nodes = list()
-    for i in range(n):
-        list_of_nodes.append(Node(name=str(i)))
-    print(list_of_nodes)
-    list_of_edges = list()
-    
-    while len(list_of_edges) < m:
-        selected_nodes = random.sample(list_of_nodes, 2)
-        print(selected_nodes)
-        if selected_nodes[0] != selected_nodes[1]:
-            edge = Edge(selected_nodes[0], selected_nodes[1])
-            if edge not in list_of_edges:
-                list_of_edges.append(edge)
-            
-    
+    # list_of_nodes = list()
     if graph_name == "":
         graph_name = f"Erdos_{m}x{n}"
-    generated_graph = Graph(nodes=list_of_nodes,
-                            edges=list_of_edges,
-                            is_directed=is_directed,
-                            name=graph_name)
+    graph = Graph(is_directed=is_directed, name=graph_name)
+    
+    for i in range(n):
+        graph.add_node(Node(name=str(i)))
+    print(graph.get_nodes())
+    # list_of_edges = list()
+    
+    while len(graph.edges) < m:
+        selected_nodes = random.sample(graph.nodes, 2)
+        print(selected_nodes)
+        if selected_nodes[0] != selected_nodes[1]:
+            graph.add_edge(selected_nodes[0], selected_nodes[1])
+            
+    
+    
+    # generated_graph = Graph(nodes=list_of_nodes,
+    #                         edges=list_of_edges,
+    #                         is_directed=is_directed,
+    #                         name=graph_name)
 
-    generated_graph.save_graphviz_by_node(filename=graph_name)
+    graph.save_graphviz_by_node()
 
-    return generated_graph
+    return graph
 
-def gilbert_random_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
+def gilbert_random_graph(n:int, p:float, is_directed: bool=False, graph_name: str="") -> Graph:
     """
     Generate a graph with n nodes and try m times 
     to create an edge between two nodes
     :param n: number of nodes
-    :param m: number of tries to create an edge
-    
+    :param p: probability of creating an edge
     """
-    if n < 1 or p < 0 or p > 1:
-        print("n must be bigger than 1 and p must be between 0 and 1")
-        raise ValueError()
-    list_of_nodes = [Node(name=str(i)) for i in range(n)]
-    list_of_edges = list()
-    for i in range(n):
-        for j in range(i+1, n):
-            if random.random() < p:
-                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
-            else:
-                list_of_edges.append(Edge(list_of_nodes[j], list_of_nodes[i]))
     if graph_name == "":
-        graph_name = f"Gilbert_{n}_{p}"
-    graph = Graph(nodes=list_of_nodes,
-                  edges=list_of_edges,
-                  is_directed=is_directed,
-                  name=graph_name)
-    graph.save_graphviz(filename=graph_name)
+        graph_name = f"Gilbert_{n}_{int(p*100)}"
+    graph = Graph(is_directed=is_directed, name=graph_name)
+
+    for i in range(n):
+        graph.add_node(Node(name=str(i)))
+        
+    for i in range(n):
+        for j in range(n):
+            if random.random() < p and i != j:
+                graph.add_edge(graph.nodes[i], graph.nodes[j])
     return graph
+
 
 def geographical_random_graph(n:int, r:float, is_directed: bool=False, graph_name: str="") -> Graph:
     """
-    Generate a graph with n nodes and radius r
+    Generate a graph with n nodes and connect two nodes if they are closer than r
     """
-    if n < 1 or r < 0:
-        print("n must be bigger than 1 and r must be positive")
-        raise ValueError()
-    list_of_nodes = [Node(name=str(i)) for i in range(n)]
-    list_of_edges = list()
-    for i in range(n):
-        for j in range(i+1, n):
-            x1, y1 = list_of_nodes[i].get_position()
-            x2, y2 = list_of_nodes[j].get_position()
-            distance = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
-            if distance < r:
-                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
     if graph_name == "":
-        graph_name = f"Geographical_{n}_{r}"
-    graph = Graph(nodes=list_of_nodes,
-                  edges=list_of_edges,
-                  is_directed=is_directed,
-                  name=graph_name)
-    graph.save_graphviz(filename=graph_name)
+        graph_name = f"Geographical_{n}_{int(r*100)}"
+        
+    graph = Graph(is_directed=is_directed, name=graph_name)
+    for i in range(n):
+        graph.add_node(GeoNode(name=str(i), x_coord=random.random(), y_coord=random.random()))
+
+    for i in range(n):
+        for j in range(n):
+            if i != j:
+                distance = graph.nodes[i].calculate_distance(graph.nodes[j])
+                if distance < r:
+                    graph.add_edge(graph.nodes[i], graph.nodes[j])
+                    
+    graph.save_graphviz_by_node()
     return graph
 
-def barabasi_albert_graph(n:int, m:int, is_directed: bool=False, graph_name: str="") -> Graph:
+def barabasi_albert_graph(n:int, d:int, is_directed: bool=False, name: str="") -> Graph:
     """
     Generate a graph with n nodes and m edges
     """
-    if n < 1 or m < 1:
-        print("n and m must be bigger than 1")
-        raise ValueError()
-    list_of_nodes = [Node(name=str(i)) for i in range(m)]
-    list_of_edges = list()
-    for i in range(m, n):
-        list_of_nodes.append(Node(name=str(i)))
-        degrees = [len(node.edges) for node in list_of_nodes]
-        total_degree = sum(degrees)
-        probabilities = [degree/total_degree for degree in degrees]
-        for j in range(m):
-            if random.random() < probabilities[j]:
-                list_of_edges.append(Edge(list_of_nodes[i], list_of_nodes[j]))
-    if graph_name == "":
-        graph_name = f"Barabasi_Albert_{n}_{m}"
-    graph = Graph(nodes=list_of_nodes,
-                  edges=list_of_edges,
-                  is_directed=is_directed,
-                  name=graph_name)
-    graph.save_graphviz(filename=graph_name)
-    return graph
+    if name == "":
+        name = f"Barabasi-Albert_{n}_{d}"
+    graph = Graph(is_directed=is_directed, name=name)
 
+    for i in range(n):
+        new_node = Node(name=str(i))
+        graph.add_node(new_node)
+        for existent_node in graph.nodes:
+            if existent_node != new_node:
+                chances =  1 - (existent_node.get_degree() / d)
+                if chances > random.random():
+                    graph.add_edge(new_node, existent_node)
+            
+    graph.save_graphviz_by_node()
+    
+    return graph
+    
+    
 def dorogovtsev_mendes_graph(n:int, is_directed: bool=False, graph_name: str="") -> Graph:
     """
     Generate a graph with n nodes

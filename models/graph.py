@@ -15,7 +15,6 @@ class Node:
         self.name = f'N_{name}'
         self.in_edges = list()
         self.out_edges = list()
-        
 
     def add_in_edge(self, edge) -> None:
         """append the edge to the list of edges of the node
@@ -29,8 +28,15 @@ class Node:
         """append the edge to the list of edges of the node
         so we can know the edges that are connected to the node"""
         self.out_edges.append(edge)
-    
+
     def get_degree(self) -> int:
+        """ 
+        return the degree of the node, which is 
+        the number of edges connected to the node
+        """
+        return len(self.in_edges) + len(self.out_edges)
+
+    def get_indegree(self) -> int:
         """ 
         return the degree of the node, which is 
         the number of edges connected to the node
@@ -49,6 +55,29 @@ class Node:
 
     def __eq__(self, other) -> bool:
         return self.name == other.name
+
+class GeoNode(Node):
+    """
+    Node class to represent a node in a graph
+    :param value: value to identify of the node   
+    """
+    def __init__(self, name: str, x_coord: float=0, y_coord: float=0):        
+        super().__init__(name)
+        self.x_coord = x_coord
+        self.y_coord = y_coord
+
+    def calculate_distance(self, other) -> float:
+        """"
+        Calculate the distance between two nodes
+        """
+        return ((self.x_coord - other.x_coord) ** 2 + (self.y_coord - other.y_coord) ** 2) ** 0.5
+    
+    def __repr__(self) -> str:
+        return f"{self.name} ({self.x_coord}, {self.y_coord})"
+
+    def __eq__(self, other) -> bool:
+        return self.name == other.name
+
     
 @dataclass
 class Edge:
@@ -62,7 +91,7 @@ class Edge:
         self.weigth = weigth
         self.node_from = node_from
         self.node_to = node_to
-        self.add_to_nodes()
+        # self.add_to_nodes()
 
     def add_to_nodes(self):
         """
@@ -135,6 +164,12 @@ class Graph:
         :param node: node to be inserted
         """
         self.nodes.append(node)
+        
+    def get_nodes(self) -> list:
+        """
+        Return the list of nodes in the graph
+        """
+        return self.nodes
     
     def add_edge(self, from_node: Node, to_node: Node, weight: str="") -> None:
         """
@@ -146,7 +181,9 @@ class Graph:
             edge = DirectedEdge(from_node, to_node, weight)
         else:
             edge = Edge(from_node, to_node, weight)
-        self.edges.append(edge)
+        if edge not in self.edges:
+            edge.add_to_nodes()
+            self.edges.append(edge)
     
     def save_graphviz_by_node(self) -> str:
         """
@@ -155,9 +192,9 @@ class Graph:
         current_datetime_code = datetime.now().strftime("%Y%m%d%H%M")
         filename = f"graph_{self.name}_{current_datetime_code}.dot"    
         fileroute = f"outputs/{filename}"
-
+        graph_type = "digraph" if self.is_directed else "graph"
         with open(fileroute, "w", encoding="UTF") as file:
-            file.write(f"graph {self.name}" + "{\n")
+            file.write(f"{graph_type} {self.name}" + "{\n")
             for node in self.nodes:
                 if node.get_outdegree() > 0:
                     for edge in node.out_edges:    
@@ -167,6 +204,7 @@ class Graph:
             file.write("}")
 
         print(f"Graph saved to {fileroute} ")
+    
     
     def __str__(self):
         for edge in self.edges:
