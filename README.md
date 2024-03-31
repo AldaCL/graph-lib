@@ -121,6 +121,50 @@ _Below is an example of how you can instruct your audience on installing and set
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
+## Examples:
+
+### Mesh Graph
+<p align="center">
+<img src="./outputs/mesh_30.png" width="480">
+<img src="./outputs/mesh_100.png" width="480">
+<img src="./outputs/mesh_500.png" width="480">
+</p>
+
+### Erdös and Rényi Graph
+<p align="center">
+<img src="./outputs/Ergos30.png" width="480">
+<img src="./outputs/Ergos100.png" width="480">
+<img src="./outputs/Ergos500.png" width="480">
+</p>
+
+### Geographic Graph
+<p align="center">
+<img src="./outputs/geo_30.png" width="480">
+<img src="./outputs/geo_100.png" width="480">
+<img src="./outputs/geo_500.png" width="480">
+</p>
+
+### Gilbert Graph
+<p align="center">
+<img src="./outputs/Gilbert_30.png" width="480">
+<img src="./outputs/Gilbert_100.png" width="480">
+<img src="./outputs/Gilbert_500.png" width="480">
+</p>
+
+### Barabási-Albert Graph
+<p align="center">
+<img src="./outputs/Barabasi_30.png" width="480">
+<img src="./outputs/Barabasi_100.png" width="480">
+<img src="./outputs/Barabasi_500.png" width="480">
+</p>
+
+### Dorogovtsev-Mendes Graph
+<p align="center">
+<img src="./outputs/Dorogovtsev_10.png" width="480">
+<img src="./outputs/Dorogovtsev_100.png" width="480">
+<img src="./outputs/Dorogovtsev_500.png" width="480">
+</p>
+
 
 <!-- ROADMAP -->
 ## Roadmap
