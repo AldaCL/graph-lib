@@ -21,13 +21,37 @@ class Node:
         so we can know the edges that are connected to the node
         This list will alos be used to non directed graphs to add 
         non directed edges
+        
+        Args: 
+            edge (Edge): edge to be added to the node
+        Examples:
+            >>> node = Node('A')
+            >>> edge = Edge(Node('A'), Node('B'))
+            >>> node.add_in_edge(edge)
+        Returns:
+            None
         """
-        self.in_edges.append(edge)
+        # As long as the edge can be None due to disconnected nodes, is needed to validate if 
+        # incomming edge is not none
+        if edge:
+            self.in_edges.append(edge)
 
     def add_out_edge(self, edge) -> None:
-        """append the edge to the list of edges of the node
-        so we can know the edges that are connected to the node"""
-        self.out_edges.append(edge)
+        """
+        append the edge to the list of edges of the node
+        so we can know the edges that are connected to the node
+        
+        Args:
+            edge (Edge): edge to be added to the node
+        Examples:
+            >>> node = Node('A')
+            >>> edge = Edge(Node('A'), Node('B'))
+            >>> node.add_out_edge(edge)
+        Returns:
+            None
+        """
+        if edge:
+            self.out_edges.append(edge)
 
     def get_degree(self) -> int:
         """ 
@@ -83,9 +107,17 @@ class GeoNode(Node):
 class Edge:
     """
     Edge class to represent an edge in a graph
-    :param weigth: weigth of the edge
-    :param node_from: starting node of the edge
-    :param node_to: ending node of the edge
+    
+    Attributes:
+        node_from (Node): starting node of the edge
+        node_to (Node): ending node of the edge
+        weigth (int): weigth of the edge
+    
+    Examples:
+        >>> node1 = Node('A')
+        >>> node2 = Node('B')
+        >>> edge = Edge(node1, node2, 10) # Weigth of 10
+        >>> edge_without_weigth = Edge(node1, node2) # Weigth of 1 as default
     """
     def __init__(self, node_from: Node, node_to: Node, weigth: int=1):
         self.weigth = weigth
@@ -96,7 +128,8 @@ class Edge:
     def add_to_nodes(self):
         """
         call the add_edge method of the node_from and node_to
-        to add the edge to the list of edges of the nodes
+        to add the edge to the list of edges of the nodes.
+        
         """
         self.node_from.add_out_edge(self)
         self.node_to.add_in_edge(self)
@@ -105,6 +138,10 @@ class Edge:
         """
         return the tuple of nodes connected by the edge
         (node_from, node_to)
+        Args:
+            None
+        Returns:
+            tuple: tuple of nodes connected by the edge
         """
         return (self.node_from, self.node_to)
 
@@ -121,9 +158,10 @@ class Edge:
 class DirectedEdge(Edge):
     """
     Edge class to represent an edge in a graph
-    :param weigth: weigth of the edge
-    :param node_from: starting node of the edge
-    :param node_to: ending node of the edge
+    Attributes:
+        node_from (Node): starting node of the edge
+        node_to (Node): ending node of the edge
+        weigth (int): weigth of the edge
     """
     def __init__(self, node_from: Node, node_to: Node, weigth: int=1):
         super().__init__(node_from, node_to, weigth)
@@ -141,8 +179,18 @@ class Graph:
     """
     Graph class to represent a graph with a 
     list of nodes and edges
-    :param nodes: list of nodes in the graph
-    :param edges: list of edges in the graph
+    Attributes:
+        nodes (list): list of nodes in the graph
+        edges (list): list of edges in the graph
+        is_directed (bool): flag to indicate if the graph is directed
+        name (str): name of the graph
+    Examples:
+        >>> graph = Graph()
+        >>> node1 = Node('A')
+        >>> node2 = Node('B')
+        >>> graph.add_node(node1)
+        >>> graph.add_node(node2)
+        >>> graph.add_edge(node1, node2)
     """
     def __init__(self,
                  nodes: list=None,
@@ -160,8 +208,17 @@ class Graph:
     
     def add_node(self, node: Node) -> None:
         """
-        Insert a node to the list of nodes in the graph
-        :param node: node to be inserted
+        Insert a node to the list of nodes in the graph.
+        Warning: of deprecation Use this methods carefully as it does not check if the node is already in the graph
+        Neither connects the node to the graph by adding the edges to the node
+        Args:
+            node (Node): node to be added to the graph
+        Returns:
+            None
+        Examples:
+            >>> graph = Graph()
+            >>> node1 = Node('A')
+            >>> graph.add_node(node1)
         """
         self.nodes.append(node)
         
@@ -174,8 +231,17 @@ class Graph:
     def add_edge(self, from_node: Node, to_node: Node, weight: str="") -> None:
         """
         Insert an edge to the list of edges in the graph
-        :param from_node: starting node of the edge
-        :param to_node: ending node of the edge
+        Args:
+            from_node (Node): starting node of the edge
+            to_node (Node): ending node of the edge
+            weight (str): weight of the edge
+        Returns:
+            None
+        Examples:
+            >>> graph = Graph()
+            >>> node1 = Node('A')
+            >>> node2 = Node('B')
+            >>> graph.add_edge(node1, node2)
         """
         if self.is_directed:
             edge = DirectedEdge(from_node, to_node, weight)
@@ -211,80 +277,5 @@ class Graph:
             return edge.__repr__()
 
 
-    # def save_graphviz(self, filename:str = "") -> str:
-    #     """
-    #     Save the graph to a txt file in graphViz format
-    #     """
-    #     current_datetime_code = datetime.now().strftime("%Y%m%d%H%M")
-    #     if filename == "":
-    #         filename = f"graph_{self.name}_{current_datetime_code}.dot"
-    #     else: 
-    #         filename = f"{filename}_{current_datetime_code}.dot"
-
-    #     fileroute = f"outputs/{filename}"
-        
-    #     with open(fileroute, "w", encoding="UTF") as file:
-    #         file.write(f"graph {self.name}" + "{\n")
-    #         for edge in self.edges:
-    #             file.write(edge.__repr__())
-    #         file.write("}")
-
-    #     print(f"Graph saved to {fileroute} ")
-# class DirectedGraph(Graph):
-#     """
-#     Graph class to represent a graph with a 
-#     list of nodes and edges
-#     :param nodes: list of nodes in the graph
-#     :param edges: list of edges in the graph
-#     """
-#     def __init__(self,
-#                  nodes: list=None,
-#                  edges: list=None,
-#                  is_directed: bool= True,
-#                  name: str="GenericGraph"):
-#         super().__init__(nodes, edges, is_directed, name)
-        
-#     def save_graphviz(self, filename:str = "") -> str:
-#         """
-#         Save the graph to a txt file in graphViz format
-#         """
-#         current_datetime_code = datetime.now().strftime("%Y%m%d%H%M")
-#         if filename == "":
-#             filename = f"graph_{self.name}_{current_datetime_code}.dot"
-#         else: 
-#             filename = f"{filename}_{current_datetime_code}.dot"
-
-#         fileroute = f"outputs/{filename}"
-
-#         with open(fileroute, "w", encoding="UTF") as file:
-#             file.write(f"digraph {self.name}" + "{\n")
-#             for edge in self.edges:
-#                 file.write(edge.__repr__())
-#             file.write("}")
-
-#         print(f"Graph saved to {fileroute} ")
-    
-#     def save_graphviz_by_node(self, filename:str = "") -> str:
-#         """
-#         Save the graph to a txt file in graphViz format
-#         """
-#         current_datetime_code = datetime.now().strftime("%Y%m%d%H%M")
-#         if filename == "":
-#             filename = f"graph_{self.name}_{current_datetime_code}.dot"
-#         else: 
-#             filename = f"{filename}_{current_datetime_code}.dot"
-
-#         fileroute = f"outputs/{filename}"
-
-#         with open(fileroute, "w", encoding="UTF") as file:
-#             file.write(f"digraph {self.name}" + "{\n")
-#             for node in self.nodes:
-#                 if node.get_degree() > 0:
-#                     for edge in node.edges:
-#                         file.write(edge.__repr__())
-#                 else:
-#                     file.write(f"{node.name}; \n")
-#             file.write("}")
-
-#         print(f"Graph saved to {fileroute} ")
-       
+    def get_bfs_given_node(self, starting_node: Node):
+        pass
