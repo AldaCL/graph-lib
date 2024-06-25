@@ -1,0 +1,25 @@
+graph graph_graph_Dorogovtsev-Mendes_10_202403310231_weigth_202406242354{
+N_0_0 -> N_1_6 [label=6, color=red]; 
+N_1_6 -> N_2_78 [label=86]; 
+N_2_78 -> N_0_0 [label=78, color=red]; 
+N_3_82 -> N_2_78 [label=34]; 
+N_3_82 -> N_0_0 [label=82, color=red]; 
+N_4_143 -> N_3_82 [label=61, color=red]; 
+N_4_143 -> N_2_78 [label=81]; 
+N_5_63 -> N_3_82 [label=89]; 
+N_5_63 -> N_0_0 [label=63, color=red]; 
+N_6_139 -> N_5_63 [label=76, color=red]; 
+N_6_139 -> N_3_82 [label=93]; 
+N_7_45 -> N_1_6 [label=39, color=red]; 
+N_7_45 -> N_2_78 [label=43]; 
+N_8_87 -> N_3_82 [label=27]; 
+N_8_87 -> N_0_0 [label=87, color=red]; 
+N_9_143 -> N_3_82 [label=61, color=red]; 
+N_9_143 -> N_2_78 [label=96]; 
+N_10_147 -> N_9_143 [label=22]; 
+N_10_147 -> N_2_78 [label=69, color=red]; 
+N_11_117 -> N_4_143 [label=68]; 
+N_11_117 -> N_2_78 [label=39, color=red]; 
+N_12_97 -> N_4_143 [label=70]; 
+N_12_97 -> N_3_82 [label=15, color=red]; 
+}

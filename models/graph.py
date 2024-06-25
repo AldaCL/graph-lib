@@ -139,6 +139,7 @@ class Edge:
         self.weigth = weigth
         self.node_from = node_from
         self.node_to = node_to
+        self.alter_color = False
         # self.add_to_nodes()
 
     def add_to_nodes(self):
@@ -175,6 +176,19 @@ class Edge:
             return self.node_from
         else:
             return None
+    
+    def print_with_weight(self)->str:
+        """
+        return the string representation of the edge with its weight
+        Args:
+            None
+        Returns:
+            str: string representation of the edge with its weight
+        """
+        if self.alter_color:
+            return f"{self.node_from.name} -> {self.node_to.name} [label={self.weigth}, color=red]; \n"
+        else:
+            return f"{self.node_from.name} -> {self.node_to.name} [label={self.weigth}]; \n"
     
     def __repr__(self):
         return f"{self.node_from.name} -> {self.node_to.name}; \n"
@@ -384,6 +398,24 @@ class Graph:
             file.write("}")
 
         print(f"Graph saved to {fileroute} ")
+
+
+    def save_graphviz_with_weigth(self, is_dijkstra: bool = False) -> str:
+        current_datetime_code = datetime.now().strftime("%Y%m%d%H%M")
+        if is_dijkstra:
+            filename = f"graph_{self.name}_{current_datetime_code}_dijkstra.dot"
+        else:
+            filename = f"graph_{self.name}_{current_datetime_code}.dot"
+        fileroute = f"outputs/{filename}"
+        graph_type = "digraph" if self.is_directed else "graph"
+        with open(fileroute, "w", encoding="UTF") as file:
+            file.write(f"{graph_type} {self.name}" + "{\n")
+            for edge in self.edges:
+                file.write(edge.print_with_weight())
+            file.write("}")
+
+        print(f"Graph saved to {fileroute} ")
+
     
     
     def __str__(self):
@@ -452,9 +484,6 @@ class Graph:
         dfs_recursive(starting_node)
         return dfs_tree
     
-        
-    
-    
     def get_dfs_iterative(self, starting_node_index: int = 0) -> 'Graph':
         """
         Calculate the depth first search tree of the graph given an starting node
@@ -468,12 +497,7 @@ class Graph:
         Returns:
             Graph: graph with the DFS tree
         """
-        if starting_node_name:
-            starting_node = [node for node in self.nodes if node.name == starting_node_name][0]
-        elif starting_node_index:
-            starting_node = self.nodes[starting_node_index]
-        else:
-            starting_node = self.nodes[0]
+        starting_node = list(self.nodes)[starting_node_index]
             
         dfs_tree = Graph(name=f"DFS_I_{self.name}")
         visited = set()
@@ -482,11 +506,61 @@ class Graph:
         while stack:
             current_node = stack.pop()
             visited.add(current_node)
-            dfs_tree.add_node(current_node)
-            for edge in current_node.out_edges:
-                if edge.node_to not in visited:
-                    stack.append(edge.node_to)
-                    dfs_tree.add_edge(current_node, edge.node_to)
-        
+            for edge in current_node.get_edges():
+                connected_node = edge.get_connected_node(current_node)
+                if connected_node not in visited:
+                    stack.append(connected_node)
+                    dfs_tree.add_edge(current_node, connected_node)
+                    visited.add(connected_node)
+
         return dfs_tree
 
+
+    def get_dijkstra(self, as_color_tree:bool = True) -> None:
+        """
+        Calculate the shortest path tree of the graph given an starting node
+        The path will be calculated using the Dijkstra algorithm
+        and can either mark the tree as a set of edges with color altered
+        or as a new Graph with the shortest path tree
+        """
+        # Create visited nodes list
+        visited = set()
+        # Create the shortest path tree
+        shortest_path_tree = dict()
+        set_of_minimun_edges = list()
+        
+        for node in self.nodes:
+            shortest_path_tree[node] = (None, float('inf'))
+        
+        # Set starting node updating its distance to 0
+        shortest_path_tree[list(self.nodes)[0]] = (None, 0)
+        
+        while len(visited) < len(self.nodes):
+            # Get the node with the minimum distance
+            current_node = min((node for node in self.nodes if node not in visited), key=lambda x: shortest_path_tree[x][1])
+            visited.add(current_node)
+            
+            for edge in current_node.get_edges():
+                connected_node = edge.get_connected_node(current_node)
+                if connected_node not in visited:
+                    distance = shortest_path_tree[current_node][1] + edge.weigth
+                    if distance < shortest_path_tree[connected_node][1]:
+                        shortest_path_tree[connected_node] = (current_node, distance)
+
+                        for prev_edge in connected_node.get_edges():
+                            prev_edge.alter_color = False
+    
+                        if edge not in set_of_minimun_edges:
+                            set_of_minimun_edges.append(edge)
+                            edge.alter_color = True
+                        
+        
+        # Update node name and add sufix to the node name with the distance
+        for node in self.nodes:
+            node.name = f"{node.name}_{shortest_path_tree[node][1]}"
+        # Create a new graph with the shortest path tree
+        # shortest_path_tree_graph = Graph(name=f"Only_tree_Dijkstra_{self.name}")
+        
+        # for edge in set_of_minimun_edges:
+        #     shortest_path_tree_graph.add_edge(edge.node_from, edge.node_to, edge.weigth)
+        # shortest_path_tree_graph.save_graphviz_with_weigth()

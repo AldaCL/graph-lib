@@ -29,19 +29,27 @@ def generate_graph_for_all_files_in_folder(dump: bool = False) -> list:
         pickle.dump(list_of_graphs, open("outputs/graphs.pkl", "wb"))
     return list_of_graphs
 
+def generate_graph_for_all_files_and_add_weight() -> list:
+    list_of_files = utils.get_files_in_folder('outputs')
+    list_of_graphs = list()
+    for file in list_of_files:
+        graph = utils.read_graph_from_file(f"outputs/{file}", add_random_weigth=True)
+        print(f"Graph: {graph.name}")
+        list_of_graphs.append(graph)
+    return list_of_graphs
+
 def load_graphs_from_file() -> list:
     return pickle.load(open("outputs/graphs.pkl", "rb"))
 
 if __name__ == "__main__":
-    graphs = generate_graph_for_all_files_in_folder(dump=False)
-    # graphs = load_graphs_from_file()
+    # graphs = generate_graph_for_all_files_and_add_weight()
+    graphs = generate_graph_for_all_files_in_folder()
     # Sort by graph.name
     graphs.sort(key=lambda x: x.name)
     names = [graph.name for graph in graphs]
-    graph_1 = graphs[0]
     for graph in graphs:
         print(f"Graph: {graph.name}")
-        bfs = graph.get_bfs_tree()
-        bfs.save_graphviz_by_edges()
+        graph.get_dijkstra(as_color_tree=True)
+        graph.save_graphviz_with_weigth(is_dijkstra=True)
     breakpoint()
     

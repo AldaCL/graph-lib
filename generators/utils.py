@@ -2,6 +2,7 @@
 utility functions to avoid large class methods
 """
 import os
+import random
 
 from models.graph import Graph, Node
 from datetime import datetime
@@ -17,13 +18,17 @@ def get_distance(node1: Node, node2: Node) -> float:
 
 
 
-def read_graph_from_file(file_path: str) -> Graph:
+def read_graph_from_file(file_path: str, add_random_weigth: bool = False) -> Graph:
     """
     Read a graph from a file
     :param file_path: path to the file
     :return: graph object
     """
-    graph = Graph(name = file_path.split("/")[-1].split(".")[0])
+    if add_random_weigth:
+        graph_name = file_path.split("/")[-1].split(".")[0] + "_weigth"
+    else:
+        graph_name = file_path.split("/")[-1].split(".")[0]
+    graph = Graph(name = graph_name)
     print(f"Reading graph from file: {file_path}")
     with open(file_path, 'r') as f:
         for line in f:
@@ -43,7 +48,9 @@ def read_graph_from_file(file_path: str) -> Graph:
                 weight = 1
             elif len(line) == 3:
                 # Two nodes in the line with weight
-                node1, node2, weight = Node(line[0]), Node(line[1]), int(line[2])
+                node1, node2, weight = Node(line[0]), Node(line[1]), int(line[2].strip("[label=").strip("]"))
+            if add_random_weigth:
+                weight = random.randint(1, 100)
             graph.add_validated_edge(node1, node2, weight)
     if graph.get_nodes() == []:
         print("Graph is empty")
