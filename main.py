@@ -32,7 +32,7 @@ def generate_graph(args):
         # elif args.n < args.m - 1:
         #     raise ValueError("m must be bigger than n - 1")
         elif args.directed and args.m > (args.n * (args.n - 1)):
-            raise ValueError("m must be smaller than n(n-1)")
+            raise ValueError("m must be bigger than n(n-1)")
         elif not args.directed and args.m > ((args.n * (args.n - 1)) / 2):
             raise ValueError("m must be smaller than n(n-1)/2")
 
@@ -84,7 +84,7 @@ def main():
     parser.add_argument("-m", type=int, help="Main number of nodes in the ")
     parser.add_argument("-n", type=int, help="Secondary number of nodes in the graph (If algorithm needs it)")
     parser.add_argument("-p", "--probability", type=float, help="Probability of the edge to be created")
-    parser.add_argument("-d", "--directed", action=argparse.BooleanOptionalAction, help="If the graph is directed", default=True)
+    parser.add_argument("-d", "--directed", action=argparse.BooleanOptionalAction, help="If the graph is directed", default=False)
     parser.add_argument("-o", "--output", type=str, help="Output file name", default="")
 
     args = parser.parse_args()

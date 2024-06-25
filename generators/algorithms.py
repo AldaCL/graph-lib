@@ -78,17 +78,11 @@ def erdos_renyi_random_graph(n:int, m:int, is_directed: bool=False, graph_name: 
     # list_of_edges = list()
     
     while len(graph.edges) < m:
-        selected_nodes = random.sample(graph.nodes, 2)
+        # Selesct a random sample of two nodes from the set of nodes
+        selected_nodes = random.sample(list(graph.nodes), 2)
         print(selected_nodes)
         if selected_nodes[0] != selected_nodes[1]:
             graph.add_edge(selected_nodes[0], selected_nodes[1])
-            
-    
-    
-    # generated_graph = Graph(nodes=list_of_nodes,
-    #                         edges=list_of_edges,
-    #                         is_directed=is_directed,
-    #                         name=graph_name)
 
     graph.save_graphviz_by_node()
 
@@ -146,15 +140,25 @@ def barabasi_albert_graph(n:int, d:int, is_directed: bool=False, graph_name: str
         graph_name = f"Barabasi-Albert_{n}_{d}"
     graph = Graph(is_directed=is_directed, name=graph_name)
 
-    for i in range(n):
-        new_node = Node(name=str(i))
-        for existent_node in graph.nodes:
-            if existent_node != new_node:
-                chances =  1 - (existent_node.get_degree() / d)
-                if chances > random.random():
+    # Create initial graph with 5 nodes
+    initial_nodes = list()
+    for i in range(5):
+        initial_nodes.append(Node(name=str(i)))
+        
+    for i in range(5):
+        for j in range(5):
+            if i != j:
+                graph.add_edge(initial_nodes[i], initial_nodes[j])
+    
+    while len(graph.nodes) < n:
+        new_node = Node(name=str(i + 5))
+        current_nodes = graph.nodes.copy()
+        for existent_node in current_nodes:
+                # d is the max grade of the node and the chances of connecting to the node
+                # is proportional to the grade of the node
+                if existent_node.get_degree() < d and random.random() < existent_node.get_degree() / sum([node.get_degree() for node in current_nodes]):
                     graph.add_edge(new_node, existent_node)
-        graph.add_node(new_node)
-            
+        i += 1
     graph.save_graphviz_by_node()
     return graph
     
