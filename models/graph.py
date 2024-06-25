@@ -11,11 +11,20 @@ class Node:
     Node class to represent a node in a graph
     :param value: value to identify of the node   
     """
-    def __init__(self, name: str):        
+    def __init__(self, name: str, x_coord: float=0, y_coord: float=0):  
         self.name = f'N_{name}'
         self.in_edges = list()
         self.out_edges = list()
-
+        self.x_coord = x_coord
+        self.y_coord = y_coord
+    
+    def calculate_distance(self, other) -> float:
+        """"
+        Calculate the distance between two nodes
+        """
+        return ((self.x_coord - other.x_coord) ** 2 + (self.y_coord - other.y_coord) ** 2) ** 0.5
+    
+        
     def add_in_edge(self, edge) -> None:
         """append the edge to the list of edges of the node
         so we can know the edges that are connected to the node
@@ -240,8 +249,8 @@ class Graph:
         >>> graph.add_edge(node1, node2)
     """
     def __init__(self,
-                 nodes: set=None,
-                 edges: list=None,
+                 nodes: set[Node]=None,
+                 edges: list[Edge]=None,
                  is_directed: bool= False,
                  name: str="GenericGraph"):
         self.name = name

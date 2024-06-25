@@ -52,5 +52,4 @@ if __name__ == "__main__":
         print(f"Calculating MST Directed for {graph.name}")
         kruskal_mst=graph.get_mst_by_prim_algorithm()
         # kruskal_mst.save_graphviz_with_weigth(is_dijkstra=True)
-s    breakpoint()
     
