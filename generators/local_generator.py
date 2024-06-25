@@ -48,8 +48,9 @@ if __name__ == "__main__":
     graphs.sort(key=lambda x: x.name)
     names = [graph.name for graph in graphs]
     for graph in graphs:
-        print(f"Graph: {graph.name}")
-        graph.get_dijkstra(as_color_tree=True)
-        graph.save_graphviz_with_weigth(is_dijkstra=True)
+        # print(f"Graph: {graph.name}")
+        print(f"Calculating MST Directed for {graph.name}")
+        kruskal_mst=graph.get_MST_by_kruskal_direct()
+        # kruskal_mst.save_graphviz_with_weigth(is_dijkstra=True)
     breakpoint()
     
