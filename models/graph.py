@@ -615,3 +615,106 @@ class Graph:
         print("---------------------------------------")
         print(f"Direct Kruskal MST value: {mst_weight}")
         minimum_spanning_tree.save_graphviz_with_weigth()
+        
+    def get_MST_by_kruskal_inverse(self) -> None:
+        """
+        Calculate the minimum spanning tree of the graph given an starting node
+        The path will be calculated using the Kruskal algorithm
+        """
+        # Create visited nodes list
+        visited = set()
+        # Create the shortest path tree
+        set_of_minimun_edges = list()
+        # Create the set of sets to keep track of the connected components
+        connected_components = set()
+        
+        for node in self.nodes:
+            connected_components.add(frozenset([node]))
+        
+        # Create a list of edges
+        list_of_edges = list(self.edges)
+        # Sort the list of edges by weight
+        list_of_edges.sort(key=lambda x: x.weigth, reverse=True)
+        
+        while len(connected_components) > 1 and list_of_edges != []:
+            # Get the edge with the minimum weight
+            edge = list_of_edges.pop(0)
+            # Get the connected nodes of the edge
+            node_from, node_to = edge.get_nodes()
+            # Get the connected components of the nodes
+            component_from = None
+            component_to = None
+            for component in connected_components:
+                if node_from in component:
+                    component_from = component
+                if node_to in component:
+                    component_to = component
+            # If the nodes are in different components, add the edge to the minimum spanning tree
+            if component_from != component_to:
+                set_of_minimun_edges.append(edge)
+                connected_components.remove(component_from)
+                connected_components.remove(component_to)
+                connected_components.add(component_from.union(component_to))
+        
+        # Create a new graph with the minimum spanning tree
+        minimum_spanning_tree = Graph(name=f"MST_Kruskal_Inverse{self.name}")
+        
+        for edge in set_of_minimun_edges:
+            minimum_spanning_tree.add_edge(edge.node_from, edge.node_to, edge.weigth)
+        # Print value of mst:
+        mst_weight = sum([edge.weigth for edge in set_of_minimun_edges])
+        print("---------------------------------------")
+        print(f"Inverse Kruskal MST value: {mst_weight}")
+        minimum_spanning_tree.save_graphviz_with_weigth()
+        
+        
+    def get_mst_by_prim_algorithm(self) -> None:
+        """
+        Calculate the minimum spanning tree of the graph given an starting node
+        The path will be calculated using the Prim algorithm
+        """
+        # Create visited nodes list
+        visited = set()
+        # Create the shortest path tree
+        set_of_minimun_edges = list()
+        # Create the set of sets to keep track of the connected components
+        connected_components = set()
+        
+        for node in self.nodes:
+            connected_components.add(frozenset([node]))
+        
+        # Create a list of edges
+        list_of_edges = list(self.edges)
+        # Sort the list of edges by weight
+        list_of_edges.sort(key=lambda x: x.weigth)
+        
+        while len(connected_components) > 1 and list_of_edges != []:
+            # Get the edge with the minimum weight
+            edge = list_of_edges.pop(0)
+            # Get the connected nodes of the edge
+            node_from, node_to = edge.get_nodes()
+            # Get the connected components of the nodes
+            component_from = None
+            component_to = None
+            for component in connected_components:
+                if node_from in component:
+                    component_from = component
+                if node_to in component:
+                    component_to = component
+            # If the nodes are in different components, add the edge to the minimum spanning tree
+            if component_from != component_to:
+                set_of_minimun_edges.append(edge)
+                connected_components.remove(component_from)
+                connected_components.remove(component_to)
+                connected_components.add(component_from.union(component_to))
+        
+        # Create a new graph with the minimum spanning tree
+        minimum_spanning_tree = Graph(name=f"MST_Prim_{self.name}")
+        
+        for edge in set_of_minimun_edges:
+            minimum_spanning_tree.add_edge(edge.node_from, edge.node_to, edge.weigth)
+        # Print value of mst:
+        mst_weight = sum([edge.weigth for edge in set_of_minimun_edges])
+        print("---------------------------------------")
+        print(f"Prim MST value: {mst_weight}")
+        minimum_spanning_tree.save_graphviz_with_weigth()

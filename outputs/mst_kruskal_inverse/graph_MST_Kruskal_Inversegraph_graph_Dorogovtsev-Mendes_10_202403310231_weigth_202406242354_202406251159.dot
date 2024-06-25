@@ -1,0 +1,14 @@
+graph MST_Kruskal_Inversegraph_graph_Dorogovtsev-Mendes_10_202403310231_weigth_202406242354{
+N_9 -> N_2 [label=96]; 
+N_6 -> N_3 [label=93]; 
+N_5 -> N_3 [label=89]; 
+N_8 -> N_0 [label=87]; 
+N_1 -> N_2 [label=86]; 
+N_3 -> N_0 [label=82]; 
+N_4 -> N_2 [label=81]; 
+N_2 -> N_0 [label=78]; 
+N_12 -> N_4 [label=70]; 
+N_10 -> N_2 [label=69]; 
+N_11 -> N_4 [label=68]; 
+N_7 -> N_2 [label=43]; 
+}

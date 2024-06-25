@@ -1,0 +1,14 @@
+graph MST_Prim_graph_graph_Dorogovtsev-Mendes_10_202403310231_weigth_202406242354{
+N_0 -> N_1 [label=6]; 
+N_12 -> N_3 [label=15]; 
+N_10 -> N_9 [label=22]; 
+N_8 -> N_3 [label=27]; 
+N_3 -> N_2 [label=34]; 
+N_7 -> N_1 [label=39]; 
+N_11 -> N_2 [label=39]; 
+N_7 -> N_2 [label=43]; 
+N_4 -> N_3 [label=61]; 
+N_9 -> N_3 [label=61]; 
+N_5 -> N_0 [label=63]; 
+N_6 -> N_5 [label=76]; 
+}
